@@ -1,0 +1,117 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  .container {
+    display: flex;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    max-width: 800px;
+    width: 100%;
+  }
+  
+  .welcome-section {
+    background-color: #28bf96;
+    color: white;
+    padding: 40px;
+    flex: 1;
+  }
+  
+  .welcome-section h1 {
+    font-size: 36px;
+    margin-bottom: 10px;
+  }
+  
+  .welcome-section h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  
+  .welcome-section p {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  
+  .login-section {
+    padding: 40px;
+    flex: 1;
+  }
+  
+  .login-section h3 {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+  
+  .login-section p {
+    font-size: 14px;
+    margin-bottom: 20px;
+    color: #666;
+  }
+  
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+  
+  .form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .form-group.remember-forgot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .form-group.remember-forgot label {
+    margin: 0;
+  }
+  
+  .form-group.remember-forgot a {
+    color: #28bf96;
+    text-decoration: none;
+  }
+  
+  .btn {
+    width: 100%;
+    padding: 10px;
+    background-color: #28bf96;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+  }
+  
+  .btn:hover {
+    background-color: #28bf96;
+  }
+  
+  .signup-link {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+  }
+  
+  .signup-link a {
+    color: #28bf96;
+    text-decoration: none;
+  }
