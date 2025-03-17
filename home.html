@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MEDIBuddy - Your Healthcare Partner</title>
+  <link rel="stylesheet" href="home.css">
+  <style>
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Welcome to MEDIBuddy</h1>
+    <p>Your trusted partner in healthcare. Access a range of medical services at your fingertips.</p>
+  </header>
+
+  <main>
+    <div class="grid-container">
+      <!-- AI Assistant Healthcare -->
+      <div class="grid-item">
+        <a href="ai-assistant.html">
+          <img src="DALL·E 2025-03-17 07.42.52 - A modern, minimalistic medical icon for AI Healthcare Assistant. The icon should feature a futuristic AI robot with a.webp" alt="AI Assistant">
+          <h3>AI Assistant Healthcare</h3>
+        </a>
+        <p>Connect with an AI-powered healthcare assistant for instant medical advice and support.</p>
+      </div>
+
+      <!-- Appointment Booking -->
+      <div class="grid-item">
+        <a href="appointment.html">
+          <img src="DALL·E 2025-03-17 07.43.06 - A modern, minimalistic medical icon for Appointment Booking. The icon should feature a calendar with a medical cross, designed in a clean, flat style .webp" alt="Appointment Booking">
+          <h3>Appointment Booking</h3>
+        </a>
+        <p>Book appointments with doctors, specialists, or clinics in just a few clicks.</p>
+      </div>
+
+      <!-- Nearest Hospital -->
+      <div class="grid-item">
+        <a href="nearest-hospital.html">
+          <img src="DALL·E 2025-03-17 07.43.15 - A modern, minimalistic medical icon for Nearest Hospital. The icon should feature a hospital building with a location pin, designed in a clean, flat s.webp" alt="Nearest Hospital">
+          <h3>Nearest Hospital</h3>
+        </a>
+        <p>Find the nearest hospitals or clinics with filters for multispeciality hospitals or clinics.</p>
+        <button onclick="showFilters()">Filter Options</button>
+        <div id="filters" style="display: none;">
+          <label><input type="checkbox" name="filter" value="clinics"> Clinics</label>
+          <label><input type="checkbox" name="filter" value="multispeciality"> Multispeciality Hospitals</label>
+        </div>
+      </div>
+
+      <!-- Urgent Ambulance Request -->
+      <div class="grid-item">
+        <a href="ambulance.html">
+          <img src="DALL·E 2025-03-17 07.43.20 - A modern, minimalistic medical icon for Urgent Ambulance Request. The icon should feature an ambulance with a flashing emergency light, designed in a .webp" alt="Urgent Ambulance">
+          <h3>Urgent Ambulance Request</h3>
+        </a>
+        <p>Request an ambulance instantly during emergencies with real-time tracking.</p>
+        <button onclick="requestAmbulance()">Request Now</button>
+      </div>
+
+      <!-- Health Records -->
+      <div class="grid-item">
+        <a href="health-records.html">
+          <img src="DALL·E 2025-03-17 07.43.24 - A modern, minimalistic medical icon for Health Records. The icon should feature a digital file with a medical cross, designed in a clean, flat style w.webp" alt="Health Records">
+          <h3>Health Records</h3>
+        </a>
+        <p>Access and manage your health records securely anytime, anywhere.</p>
+      </div>
+
+      <!-- Pharmacy Delivery -->
+      <div class="grid-item">
+        <a href="pharmacy.html">
+          <img src="DALL·E 2025-03-17 07.43.30 - A modern, minimalistic medical icon for Pharmacy Delivery. The icon should feature a medicine bottle with a delivery truck, designed in a clean, flat .webp" alt="Pharmacy Delivery">
+          <h3>Pharmacy Delivery</h3>
+        </a>
+        <p>Get medicines delivered to your doorstep from trusted pharmacies.</p>
+      </div>
+    </div>
+  </main>
+
+  <script src="home.js"></script>
+</body>
+</html>
