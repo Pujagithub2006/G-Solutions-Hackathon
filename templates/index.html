@@ -7,7 +7,7 @@
       href="https://cdn.jsdelivr.net/npm/remixicon@3.4.0/fonts/remixicon.css"
       rel="stylesheet"
     >
-    <link rel="stylesheet" href="{{url_for('static',filename='style.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/style.css')}}">
     <title>Web Design Mastery | MEDIBuddy</title>
   </head>
   <body>
@@ -22,7 +22,7 @@
           <li class="link"><a href="#">Blog</a></li>
           <li class="link"><a href="#">Contact</a></li>
         </ul>
-        <button class="btn"><a href="login.html">Sign in</a></button>
+        <button class="btn"><a href="{{ url_for('login') }}">Sign in</a></button>
       </nav>
       <header class="header">
         <div class="content">
@@ -38,8 +38,8 @@
         </div>
         <div class="image">
           <span class="image__bg"></span>
-          <img src="assets/header-bg.png" alt="header image" />
-          <div class="image__content image__content__1">
+          <img src="{{url_for('static', filename='images/img1.webp') }}" alt="header image" />
+          <div class="image__content image__content__1"> </div>
             
           <div class="image__content image__content__2">
             <ul>

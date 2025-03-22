@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MEDIBuddy - Your Healthcare Partner</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+
+  <style>
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header Section -->
+  <header>
+    <h1>Welcome to MEDIBuddy</h1>
+    <p>Your trusted partner in healthcare. Access a range of medical services at your fingertips.</p>
+  </header>
+
+  <!-- Main Grid Section -->
+  <main>
+    <div class="grid-container">
+
+      <!-- AI Assistant Healthcare -->
+      <div class="grid-item">
+        <img src="{{url_for('static', filename='images/img1.webp') }}" alt="test image">
+        <div class="text-content">
+          <h3>AI Assistant Healthcare</h3>
+          <p>Connect with an AI-powered healthcare assistant for instant medical advice and support.</p>
+        </div>
+      </div>
+
+      <!-- Appointment Booking -->
+      <div class="grid-item">
+        <img src="{{url_for('static', filename='images/img1.webp') }}" alt="test image">
+        <div class="text-content">
+          <h3>Appointment Booking</h3>
+          <p>Book appointments with doctors, specialists, or clinics in just a few clicks.</p>
+        </div>
+      </div>
+
+      <!-- Nearest Hospital -->
+      <div class="grid-item">
+        <img src="{{url_for('static', filename='images/img1.webp') }}" alt="test image">
+        <div class="text-content">
+          <h3>Nearest Hospital</h3>
+          <p>Find the nearest hospitals or clinics with filters for multispeciality hospitals or clinics.</p>
+          <button onclick="showFilters()">Filter Options</button>
+          <div id="filters" style="display: none;">
+            <label><input type="checkbox" name="filter" value="clinics"> Clinics</label>
+            <label><input type="checkbox" name="filter" value="multispeciality"> Multispeciality Hospitals</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Urgent Ambulance Request -->
+      <div class="grid-item">
+        <img src="{{url_for('static', filename='images/img1.webp') }}" alt="test image">
+        <div class="text-content">
+          <h3>Urgent Ambulance Request</h3>
+          <p>Request an ambulance instantly during emergencies with real-time tracking.</p>
+          <button onclick="requestAmbulance()">Request Now</button>
+        </div>
+      </div>
+
+      <!-- Health Records -->
+      <div class="grid-item">
+        <img src="{{url_for('static', filename='images/img1.webp') }}" alt="test image">
+        <div class="text-content">
+          <h3>Health Records</h3>
+          <p>Access and manage your health records securely anytime, anywhere.</p>
+        </div>
+      </div>
+
+      <!-- Pharmacy Delivery -->
+      <div class="grid-item">
+        <img src="{{url_for('static', filename='images/img1.webp') }}" alt="test image">
+        <div class="text-content">
+          <h3>Pharmacy Delivery</h3>
+          <p>Get medicines delivered to your doorstep from trusted pharmacies.</p>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>© 2025 MEDIBuddy. All rights reserved. | <a href="#">Privacy Policy</a></p>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/home.js') }}"></script>
+
+</body>
+</html>
