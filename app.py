@@ -143,6 +143,11 @@ def login():
             return jsonify({"success": False})
     
     return render_template('login.html') # if GET request then, render the login page
+
+@app.route('/chat_ui')
+def chat_ui():
+    return render_template('chatbot.html')
+
     
 @app.route('/chat', methods=['POST']) # route to chat with the AI
 def chat():
