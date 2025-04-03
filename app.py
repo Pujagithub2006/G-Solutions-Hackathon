@@ -3,18 +3,26 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import google.generativeai as genai # importing generativeai module from google library and setting alias as genai
 import requests
+from dotenv import load_dotenv
+import os
+load_dotenv() 
 
-GEMINI_API_KEY = "AIzaSyDIBk7dAKRtq5scQBdva6R6fZcTLBJukck"
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY") # loading the gemini api key from the .env file
+SERP_API_KEY = os.getenv("SERP_API_KEY") # loading the serp api key from the .env file
+
+
 
 genai.configure(api_key=GEMINI_API_KEY) # setting the gemini api key to the api_key attribute
 
 def get_ai_response(prompt): # function to get AI response
     model= genai.GenerativeModel("models/gemini-1.5-flash-latest")
-
     response = model.generate_content(prompt)
-    return response.text # returning the response or output
 
-
+    if(hasattr(response, "text")):
+        return response.text.strip() 
+    
+    else:
+        return "Sorry, I couldn't find any relevant results."
 
 
 app = Flask(__name__)
@@ -45,7 +53,7 @@ class Conversation(db.Model):
 
     user = db.relationship('User', back_populates = 'conversations')
 
-User.conversations = db.relationship('Conversation', back_populates = 'user', lazy = True)
+User.conversations = db.relationship('Conversation', back_populates = 'user', lazy = 'dynamic')
 
 def extract_condition(user_id):
     past_conversations = Conversation.query.filter_by(user_id = user_id).all()
@@ -59,15 +67,14 @@ def extract_condition(user_id):
     return condition_response if condition_response != "none" else None
 
 def extract_nearby_hospitals(condition, latitude, longitude):
-    query = f"{condition} speciality doctor or hospital near me"  # add query
+    query = f"Best speciality doctors and hospitals for {condition} near {latitude},{longitude}"  # add query
 
     # SERP API parameters
     params = {
         "engine" : "google",
         "q" : query, # condition extracted from above query
         "location" : f"{latitude}, {longitude}",
-        "api_key" : "1de217e1ce919521fb24131160a5dc268d02e5d3e05a9f7a3ce9bca22bcb3ba5",
-
+        "api_key" : SERP_API_KEY,
     }
 
     # Making a request to the SERP API to extract all the information
@@ -110,10 +117,10 @@ with app.app_context():
     db.create_all()
     add_predefined_users()  # Call the function to ensure users exist
     users = User.query.all()
-    print(users)
+    # print(users)
 
     conversations = Conversation.query.all()
-    print(conversations)
+    # print(conversations)
 
 # Routes
 @app.route('/') # route to home page
@@ -131,7 +138,7 @@ def login():
         user = User.query.filter_by(username=username).first()
 
         if user and check_password_hash(user.password, password):
-            return jsonify({"success": True})
+            return jsonify({"success": True, "message": f"Welcome {username}! "})
         else:
             return jsonify({"success": False})
     
@@ -142,7 +149,8 @@ def chat():
     data = request.json # get data from the request from form in json format
     user_input = data.get("message") # extract the message from the data 
     user_name = data.get("username") 
-
+    
+ 
     if user_input and user_name:
         user = User.query.filter_by(username = user_name).first() # compares the extracted username stored in the user_name variable with the username key in database
 
@@ -170,7 +178,7 @@ def chat():
 
             # Normal conversation
             else:
-                past_conversations = Conversation.query.filter_by(user_id = user.id).all()
+                past_conversations = Conversation.query.filter_by(user_id = user.id).order_by(Conversation.timestamp.desc()).limit(10).all() # get the last 10 conversations of the user to prevent slow responses
 
                 conversation_history =""
                 for conv in past_conversations:
@@ -195,8 +203,11 @@ def chat():
             return jsonify({"error": "No user found"}), 404 
 
     else:
-        return jsonify({"error": "Enter valid input"}), 400 
- 
+        return jsonify({"error": "Enter valid input"}), 400  
 
-if __name__ == '__main__':
-    app.run(debug=True)
+
+if __name__ == '__main__': # entry point check
+    print("Server is running on port 5000")
+    app.run(debug= os.getenv("FLASK_DEBUG", "False").lower() == "true")
+
+
