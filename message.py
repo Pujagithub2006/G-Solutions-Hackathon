@@ -1,6 +1,11 @@
 #Message sent 
 from flask import Flask, request, jsonify
 from twilio.rest import Client
+from dotenv import load_dotenv
+import os
+
+from app import SERP_API_KEY
+load_dotenv()
 import requests
 
 app = Flask(__name__)
@@ -12,7 +17,7 @@ twilio_number = "+17623185428"
 emergency_number = "+917588552211"
 
 # HERE API credentials
-HERE_API_KEY = "RM8ejcomJ_1uRSzX42g6BlVY4XQv0hVhS55U9i7oY_4"
+HERE_API_KEY = os.getenv(SERP_API_KEY)
 
 def get_location():
     """ Get current location coordinates (latitude & longitude) """
