@@ -11,10 +11,11 @@ import requests
 app = Flask(__name__)
 
 # Twilio credentials
-account_sid = "ACf8c7369d40a47c0f9c6c7e981d6a2689"
-auth_token = "9ccd9ef356fa30f16c2c74e46b8dd1ad"
-twilio_number = "+17623185428"
-emergency_number = "+917588552211"
+account_sid = os.getenv('ACCOUNT_SID')
+auth_token = os.getenv('AUTH_TOKEN')
+
+twilio_number = os.getenv('TWILIO_NUMBER')
+emergency_number = os.getenv('EMERGENCY_NUMBER')
 
 # HERE API credentials
 HERE_API_KEY = os.getenv(SERP_API_KEY)
