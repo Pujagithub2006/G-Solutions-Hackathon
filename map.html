@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Nearby Pharmacies</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    #map {
+      height: 400px;
+      margin-top: 20px;
+    }
+    #loading {
+      display: none;
+    }
+    .error {
+      color: red;
+    }
+    ul#pharmacy-list {
+      list-style-type: none;
+      padding: 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Nearby Pharmacies</h1>
+  <button onclick="findNearbyPharmacies()">Find Pharmacies Near Me</button>
+  <div id="loading">Searching...</div>
+  <div id="status"></div>
+  <div id="map"></div>
+  <ul id="pharmacy-list"></ul>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    let map;
+    let userMarker;
+    const SEARCH_RADIUS = 2000; // 2km
+
+    async function findNearbyPharmacies() {
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('status').innerHTML = '';
+      document.getElementById('pharmacy-list').innerHTML = '';
+
+      try {
+        const pos = await getLocation();
+        const { latitude, longitude } = pos.coords;
+
+        if (!map) initMap(latitude, longitude);
+
+        const results = await searchPharmacies(latitude, longitude);
+
+        if (results.length === 0) {
+          document.getElementById('status').innerHTML = "No pharmacies found nearby.";
+          document.getElementById('status').className = 'error';
+        } else {
+          displayResultsSorted(results, latitude, longitude);
+          document.getElementById('status').innerHTML = `Found ${results.length} pharmacies nearby.`;
+        }
+      } catch (error) {
+        document.getElementById('status').innerHTML = error.message;
+        document.getElementById('status').className = 'error';
+      } finally {
+        document.getElementById('loading').style.display = 'none';
+      }
+    }
+
+    function getLocation() {
+      return new Promise((resolve, reject) => {
+        if (!navigator.geolocation) {
+          reject(new Error("Geolocation is not supported"));
+        } else {
+          navigator.geolocation.getCurrentPosition(resolve, reject);
+        }
+      });
+    }
+
+    function initMap(lat, lon) {
+      map = L.map('map').setView([lat, lon], 14);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+      }).addTo(map);
+      userMarker = L.marker([lat, lon]).addTo(map)
+        .bindPopup("You are here").openPopup();
+    }
+
+    async function searchPharmacies(lat, lon) {
+      const query = `
+        [out:json];
+        (
+          node["amenity"="pharmacy"](around:${SEARCH_RADIUS},${lat},${lon});
+          way["amenity"="pharmacy"](around:${SEARCH_RADIUS},${lat},${lon});
+          relation["amenity"="pharmacy"](around:${SEARCH_RADIUS},${lat},${lon});
+        );
+        out center;
+      `;
+      const response = await fetch('https://overpass-api.de/api/interpreter', {
+        method: 'POST',
+        body: query
+      });
+      const data = await response.json();
+      return data.elements;
+    }
+
+    function getDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371000; // meters
+      const toRad = x => x * Math.PI / 180;
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2)**2;
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return R * c;
+    }
+
+    function displayResultsSorted(pharmacies, userLat, userLon) {
+      const list = document.getElementById('pharmacy-list');
+      list.innerHTML = '';
+
+      const sorted = pharmacies.map(p => {
+        const lat = p.lat || (p.center && p.center.lat);
+        const lon = p.lon || (p.center && p.center.lon);
+        const name = p.tags && p.tags.name ? p.tags.name : "Unnamed Pharmacy";
+        const distance = getDistance(userLat, userLon, lat, lon);
+        return { name, lat, lon, distance };
+      }).sort((a, b) => a.distance - b.distance);
+
+      sorted.forEach(p => {
+        const li = document.createElement('li');
+        li.textContent = `${p.name} - ${p.distance.toFixed(0)} meters`;
+        list.appendChild(li);
+
+        if (p.lat && p.lon) {
+          L.marker([p.lat, p.lon])
+            .addTo(map)
+            .bindPopup(`${p.name}<br>${p.distance.toFixed(0)} meters`);
+        }
+      });
+    }
+  </script>
+</body>
+</html>
