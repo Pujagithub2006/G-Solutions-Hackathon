@@ -58,7 +58,7 @@
         <div class="grid-item">
           <img src="{{url_for('static', filename='images/img1.webp') }}" alt="test image">
           <div class="text-content">
-            <h3>Urgent Ambulance Request</h3>
+            <h3>Request Emergency Help</h3>
             <p>Request an ambulance instantly during emergencies with real-time tracking.</p>
             <button onclick="requestAmbulance()">Request Now</button>
           </div>
@@ -77,13 +77,15 @@
       </a>
 
       <!-- Pharmacy Delivery -->
-      <div class="grid-item">
-        <img src="{{url_for('static', filename='images/img1.webp') }}" alt="test image">
-        <div class="text-content">
-          <h3>Pharmacy Delivery</h3>
-          <p>Get medicines delivered to your doorstep from trusted pharmacies.</p>
+      <a href="{{ url_for('pharmacy') }}" target="_blank">
+        <div class="grid-item">
+          <img src="{{url_for('static', filename='images/img1.webp') }}" alt="test image">
+          <div class="text-content">
+            <h3>Pharmacy Delivery</h3>
+            <p>Get medicines delivered to your doorstep from trusted pharmacies.</p>
+          </div>
         </div>
-      </div>
+      </a>
 
         <!-- Appointment Booking -->
       

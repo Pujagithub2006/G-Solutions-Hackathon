@@ -218,7 +218,9 @@ with app.app_context():
     db.create_all() # create all the tables
     add_predefined_users() # call the function to ensure users exist
 
-
+@app.route('/debug-session')
+def debug_session():
+    return dict(session)
 
 # Routes
  # for twilio
@@ -252,14 +254,16 @@ def home():
 def hospital():
     return render_template("hospital.html") # render the hospital page (automatically looks for hospital.html in templates folder)
 
+@app.route("/pharmacy")
+def pharmacy():
+    return render_template("pharmacy.html")
+
 @app.route('/login', methods=['GET', 'POST']) # route to login after submitting the login form and render the login form
 def login():
-    if request.method == 'POST':
+    if request.method == 'POST':       
         
         username = request.form.get("username")
-        password = request.form.get("password")
-
-        return redirect(url_for('http://127.0.0.1:5000/home')) # redirect to home page after login
+        password = request.form.get("password")  
 
         # Query the database for the user
         user = User.query.filter_by(username=username).first()
@@ -267,9 +271,9 @@ def login():
         if user and check_password_hash(user.password, password):
             return jsonify({"success": True, "message": f"Welcome {username}! "})
         else:
-            return jsonify({"success": False})        
+            return jsonify({"success": False})    
         
-    
+        return redirect(url_for('home')) # redirect to home page after login
     return render_template('login.html') # if GET request then, render the login page
 
 @app.route('/chat_ui')
@@ -343,7 +347,7 @@ def chat():
                 f"Here are 10 hospitals near you:\n\n{hospital_list}\n\n"
                  " To book an appointment, type: `Book appointment with <hospital name>`"
             )
-            response_text += '<br><br>🔗 <a href="http://127.0.0.1:5500/templates/hospital.html" target="_blank">Find these hospitals here</a>'
+            response_text += f'<br><br>📍🔗<a href="{url_for("hospital")}" target="_blank">Find all these hospitals here</a>'
         else:
             response_text = "Sorry, I couldn't find any hospitals near you at the moment."
 
