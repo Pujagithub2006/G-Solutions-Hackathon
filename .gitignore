@@ -7,3 +7,4 @@ venv.bak/
 keys.env
 __pycache__/
 creds.json
+creds.b64.txt
