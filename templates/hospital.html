@@ -1,238 +1,315 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Hospital Locator - MEDIBuddy</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hospital Finder - MEDIBuddy</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
       margin: 0;
       background-color: #f4f7ff;
+      transition: background-color 0.3s;
     }
-
-    header {
-      background-color: #00b386;
+    .header {
+      background-color: #28bf96;
       color: white;
+      padding: 20px;
       text-align: center;
-      padding: 20px 10px;
+      font-size: 24px;
+      font-weight: bold;
     }
-
     .container {
       padding: 20px;
       max-width: 1200px;
       margin: auto;
     }
-
-    .controls {
+    .search-bar {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 15px;
-      margin-bottom: 20px;
+      gap: 10px;
+      margin-bottom: 10px;
     }
-
-    input[type="text"] {
+    input[type="text"], select {
       padding: 10px;
-      width: 280px;
+      width: 220px;
       font-size: 16px;
       border: 1px solid #ccc;
       border-radius: 8px;
-      outline: none;
     }
-
     .button {
-      background-color: #00b386;
+      background-color: #28bf96;
       color: white;
-      padding: 10px 16px;
-      font-size: 16px;
+      padding: 10px 15px;
       border: none;
       border-radius: 8px;
+      font-size: 16px;
       cursor: pointer;
-      transition: background-color 0.3s ease;
+      transition: 0.3s;
     }
-
-    .button:hover {
-      background-color: #009e74;
+    .button.dark-toggle:hover {
+      background-color: #000000;
+      color:white
     }
-
+    .dark-toggle {
+      background-color: white;
+      color: black;
+      border: 1px solid #ccc;
+      transition: background-color 0.4s, color 0.4s;
+    }
+    .dark-mode .dark-toggle {
+      background-color: black;
+      color: white;
+    }
+    .below-search {
+      width: 100%;
+      text-align: center;
+      margin-top: 10px;
+    }
+    .slide-button {
+      transition: transform 0.3s ease, background-color 0.3s;
+    }
+    .slide-button:hover {
+      transform: translateY(-3px);
+    }
+    .tabs {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 15px;
+    }
+    .tab {
+      margin: 0 10px;
+      cursor: pointer;
+      padding: 8px 20px;
+      border-radius: 20px;
+      background-color: #ddd;
+      transition: all 0.3s;
+    }
+    .tab.active {
+      background-color: #28bf96;
+      color: white;
+    }
     #map {
       height: 400px;
       width: 100%;
       border-radius: 10px;
-      margin-top: 20px;
+      margin-top: 10px;
     }
-
     .hospital-list {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      margin-top: 30px;
+      margin-top: 20px;
     }
-
     .card {
-      background-color: white;
+      background: white;
       padding: 15px;
       margin: 10px;
       border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      width: 280px;
-      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      width: 300px;
+      transition: transform 0.3s, box-shadow 0.3s;
     }
-
     .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+      transform: scale(1.03);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
     }
-
-    .hospital-name {
-      font-weight: bold;
-      font-size: 18px;
-      margin-bottom: 5px;
+    .hidden {
+      display: none;
     }
-
-    .hospital-details {
-      color: #555;
+    .dark-mode {
+      background-color: #121212;
+      color: #fff;
+    }
+    .dark-mode .card {
+      background-color: #1e1e1e;
+      color: #ccc;
+    }
+    .loader {
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #28bf96;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg);}
+      100% { transform: rotate(360deg);}
+    }
+    a.map-link {
+      display: inline-block;
+      margin-top: 5px;
+      color: #007bff;
+      text-decoration: none;
       font-size: 14px;
+    }
+    a.map-link:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Hospital Locator - MEDIBuddy</h1>
-    <p>Find hospitals near you or by any city in India</p>
-  </header>
-
+  <div class="header">Hospital Locator - MEDIBuddy</div>
   <div class="container">
-    <div class="controls">
-      <button class="button" onclick="getLocation()">Find Hospitals Near Me</button>
-      <input type="text" id="cityInput" placeholder="Enter city (e.g. Delhi)">
-      <button class="button" onclick="searchHospitalsByCity()">Search by City</button>
+    <div class="search-bar">
+      <input type="text" id="cityInput" placeholder="Enter a city (e.g., Delhi)" />
+      <select id="typeFilter">
+        <option value="">All Types</option>
+        <option value="government">Government</option>
+        <option value="private">Private</option>
+        <option value="multispeciality">Multispeciality</option>
+      </select>
+      <button class="button" onclick="searchByCity()">Search</button>
+      <button class="button dark-toggle" onclick="toggleDarkMode()">Dark Mode</button>
+      <div class="below-search">
+        <button class="button slide-button" onclick="getLocation()">📍 Find Near Me</button>
+      </div>
     </div>
 
-    <div id="map"></div>
-    <div class="hospital-list" id="hospitalResults"></div>
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('all')">Map + List</div>
+      <div class="tab" onclick="switchTab('map')">Map Only</div>
+      <div class="tab" onclick="switchTab('list')">List Only</div>
+    </div>
+
+    <div id="map-container">
+      <div id="map"></div>
+    </div>
+    <div id="hospital-list" class="hospital-list"></div>
+    <div id="loader" class="loader hidden"></div>
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    let map;
+    let map, markers = [], hospitalsData = [];
+    const hospitalListEl = document.getElementById("hospital-list");
+    const loader = document.getElementById("loader");
 
-    function initMap(lat, lon) {
-      if (!map) {
-        map = L.map('map').setView([lat, lon], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
-      } else {
+    function switchTab(tab) {
+      document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+      document.querySelector(`.tab:nth-child(${tab === 'all' ? 1 : tab === 'map' ? 2 : 3})`).classList.add('active');
+      document.getElementById("map-container").classList.toggle("hidden", tab === "list");
+      hospitalListEl.classList.toggle("hidden", tab === "map");
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark-mode");
+      const tiles = document.querySelector('.leaflet-tile-pane');
+      if (tiles) tiles.style.filter = document.body.classList.contains("dark-mode") ? "invert(90%) hue-rotate(180deg)" : "none";
+    }
+
+    function initMap(lat = 28.6139, lon = 77.2090) {
+      if (map) {
         map.setView([lat, lon], 13);
+        return;
       }
+      map = L.map('map').setView([lat, lon], 13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    }
 
-      L.marker([lat, lon]).addTo(map).bindPopup("📍 You are here").openPopup();
-      fetchNearbyHospitals(lat, lon);
+    function clearMarkers() {
+      markers.forEach(marker => map.removeLayer(marker));
+      markers = [];
+    }
+
+    function showHospitals(hospitals) {
+      hospitalListEl.innerHTML = "";
+      hospitalsData = hospitals;
+
+      hospitals.forEach(({ name, lat, lon, type }) => {
+        addMarker(name, lat, lon);
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <strong>${name}</strong><br>
+          <small>${type || "General"}</small><br>
+          <a class="map-link" href="https://www.google.com/maps?q=${lat},${lon}" target="_blank">📍 View on Map</a>
+        `;
+        hospitalListEl.appendChild(card);
+      });
+    }
+
+    function addMarker(name, lat, lon) {
+      const marker = L.marker([lat, lon]).addTo(map).bindPopup(name);
+      markers.push(marker);
+    }
+
+    function filterHospitals(hospitals, type) {
+      return type ? hospitals.filter(h => h.type && h.type.toLowerCase().includes(type.toLowerCase())) : hospitals;
+    }
+
+    function searchByCity() {
+      const city = document.getElementById("cityInput").value.trim();
+      const type = document.getElementById("typeFilter").value;
+      if (!city) return alert("Please enter a city name.");
+      loader.classList.remove("hidden");
+
+      fetch(`https://nominatim.openstreetmap.org/search?format=json&q=hospital+in+${city}`)
+        .then(res => res.json())
+        .then(data => {
+          loader.classList.add("hidden");
+          if (!data.length) return alert("No hospitals found.");
+          clearMarkers();
+          initMap(data[0].lat, data[0].lon);
+          const hospitals = data.map(item => ({
+            name: item.display_name,
+            lat: item.lat,
+            lon: item.lon,
+            type: getTypeFromName(item.display_name)
+          }));
+          showHospitals(filterHospitals(hospitals, type));
+        }).catch(() => {
+          loader.classList.add("hidden");
+          alert("Error fetching hospitals.");
+        });
     }
 
     function getLocation() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(position => {
-          initMap(position.coords.latitude, position.coords.longitude);
-        }, () => {
-          alert("Geolocation not supported or permission denied.");
-        });
-      } else {
-        alert("Geolocation is not supported by this browser.");
-      }
+      loader.classList.remove("hidden");
+      navigator.geolocation.getCurrentPosition(position => {
+        const { latitude, longitude } = position.coords;
+        fetchNearbyHospitals(latitude, longitude);
+      }, () => {
+        loader.classList.add("hidden");
+        alert("Location access denied.");
+      });
     }
 
     function fetchNearbyHospitals(lat, lon) {
-      const query = `[out:json];node["amenity"="hospital"](around:5000, ${lat}, ${lon});out;`;
-      const url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`;
-
-      document.getElementById("hospitalResults").innerHTML = "<p>⏳ Searching for hospitals near you...</p>";
-
-      fetch(url)
+      initMap(lat, lon);
+      clearMarkers();
+      const type = document.getElementById("typeFilter").value;
+      const query = `[out:json];node["amenity"="hospital"](around:5000,${lat},${lon});out;`;
+      fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`)
         .then(res => res.json())
         .then(data => {
-          const results = document.getElementById("hospitalResults");
-          results.innerHTML = "";
-
-          if (data.elements.length === 0) {
-            results.innerHTML = "<p>No hospitals found nearby.</p>";
-            return;
-          }
-
-          data.elements.forEach(hospital => {
-            const name = hospital.tags.name || "Unnamed Hospital";
-            const lat = hospital.lat;
-            const lon = hospital.lon;
-
-            L.marker([lat, lon]).addTo(map).bindPopup("🏥 " + name);
-
-            const card = document.createElement("div");
-            card.className = "card";
-            card.innerHTML = `
-              <div class="hospital-name">${name}</div>
-              <div class="hospital-details">Lat: ${lat}<br>Lon: ${lon}</div>
-              <a href="https://www.google.com/maps/search/?api=1&query=${lat},${lon}" target="_blank">📍 View on Map</a>
-            `;
-            results.appendChild(card);
-          });
+          loader.classList.add("hidden");
+          const hospitals = data.elements.map(h => ({
+            name: h.tags.name || "Unnamed Hospital",
+            lat: h.lat,
+            lon: h.lon,
+            type: getTypeFromName(h.tags.name || "")
+          }));
+          showHospitals(filterHospitals(hospitals, type));
+        }).catch(() => {
+          loader.classList.add("hidden");
+          alert("Error fetching hospitals.");
         });
     }
 
-    function searchHospitalsByCity() {
-      const city = document.getElementById("cityInput").value.trim();
-      const resultsDiv = document.getElementById("hospitalResults");
-
-      if (!city) {
-        resultsDiv.innerHTML = "<p>Please enter a city name.</p>";
-        return;
-      }
-
-      resultsDiv.innerHTML = `<p>🔍 Searching hospitals in <strong>${city}</strong>...</p>`;
-
-      fetch(`https://nominatim.openstreetmap.org/search?format=json&q=hospital+in+${city}`)
-        .then(response => response.json())
-        .then(data => {
-          resultsDiv.innerHTML = "";
-
-          if (data.length === 0) {
-            resultsDiv.innerHTML = "<p>No hospitals found for this city.</p>";
-            return;
-          }
-
-          const first = data[0];
-          if (!map) {
-            map = L.map('map').setView([first.lat, first.lon], 13);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-              attribution: '&copy; OpenStreetMap contributors'
-            }).addTo(map);
-          } else {
-            map.setView([first.lat, first.lon], 13);
-          }
-
-          data.slice(0, 15).forEach(hospital => {
-            const name = hospital.display_name.split(",")[0];
-            const lat = hospital.lat;
-            const lon = hospital.lon;
-
-            L.marker([lat, lon]).addTo(map).bindPopup("🏥 " + name);
-
-            const card = document.createElement("div");
-            card.className = "card";
-            card.innerHTML = `
-              <div class="hospital-name">${name}</div>
-              <div class="hospital-details">Lat: ${lat}<br>Lon: ${lon}</div>
-              <a href="https://www.google.com/maps/search/?api=1&query=${lat},${lon}" target="_blank">📍 View on Map</a>
-            `;
-            resultsDiv.appendChild(card);
-          });
-        })
-        .catch(error => {
-          resultsDiv.innerHTML = "<p>Error fetching data. Try again later.</p>";
-        });
+    function getTypeFromName(name) {
+      const lower = name.toLowerCase();
+      if (lower.includes("govt") || lower.includes("government")) return "Government";
+      if (lower.includes("private")) return "Private";
+      if (lower.includes("multi")) return "Multispeciality";
+      return "General";
     }
+
+    window.onload = () => initMap();
   </script>
 </body>
 </html>
