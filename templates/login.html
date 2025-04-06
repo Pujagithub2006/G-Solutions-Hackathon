@@ -1,47 +1,518 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/remixi con@9.4.0/fonts/remixicon.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
-    <title>Login | MEDIBuddy</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login - 3D Experience</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script>tailwind.config={theme:{extend:{colors:{primary:'#6366f1',secondary:'#0ea5e9'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet">
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+body {
+font-family: 'Inter', sans-serif;
+overflow-x: hidden;
+min-height: 100vh;
+}
+.glassmorphism {
+backdrop-filter: blur(16px);
+background-color: rgba(255, 255, 255, 0.7);
+box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+}
+.gradient-bg {
+background: linear-gradient(135deg, #6366f1, #0ea5e9);
+}
+.gradient-text {
+background: linear-gradient(135deg, #6366f1, #0ea5e9);
+-webkit-background-clip: text;
+background-clip: text;
+color: transparent;
+}
+.floating {
+animation: float 6s ease-in-out infinite;
+}
+@keyframes float {
+0% { transform: translateY(0px); }
+50% { transform: translateY(-20px); }
+100% { transform: translateY(0px); }
+}
+.pulse {
+animation: pulse 2s infinite;
+}
+@keyframes pulse {
+0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7); }
+70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
+100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+}
+.custom-checkbox:checked + .checkbox-label:before {
+background-color: #6366f1;
+border-color: #6366f1;
+content: '✓';
+color: white;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+.checkbox-label:before {
+content: '';
+display: inline-block;
+width: 18px;
+height: 18px;
+margin-right: 8px;
+border: 2px solid #d1d5db;
+border-radius: 4px;
+transition: all 0.2s ease;
+}
+input:focus {
+outline: none;
+border-color: #6366f1;
+box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+.chat-container {
+transition: all 0.3s ease;
+transform: translateY(100%);
+opacity: 0;
+pointer-events: none;
+}
+.chat-container.active {
+transform: translateY(0);
+opacity: 1;
+pointer-events: all;
+}
+.message {
+max-width: 80%;
+margin-bottom: 12px;
+line-height: 1.5;
+padding: 8px 12px;
+border-radius: 18px;
+position: relative;
+word-wrap: break-word;
+}
+.message-received {
+background: #f3f4f6;
+border-bottom-left-radius: 4px;
+align-self: flex-start;
+}
+.message-sent {
+background: #6366f1;
+color: white;
+border-bottom-right-radius: 4px;
+align-self: flex-end;
+}
+#canvas {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+z-index: -1;
+}
+.toggle-password {
+position: absolute;
+right: 12px;
+top: 50%;
+transform: translateY(-50%);
+cursor: pointer;
+color: #9ca3af;
+}
+.custom-input {
+border: 1px solid #e5e7eb;
+transition: all 0.2s ease;
+}
+.custom-input:focus {
+border-color: #6366f1;
+box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+.login-btn {
+background: linear-gradient(135deg, #6366f1, #0ea5e9);
+transition: all 0.3s ease;
+}
+.login-btn:hover {
+transform: translateY(-2px);
+box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+.social-btn {
+transition: all 0.2s ease;
+}
+.social-btn:hover {
+transform: translateY(-2px);
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+</style>
 </head>
-<body>
-    <div class="container">
-        <div class="welcome-section">
-            <h1>👋 WELCOME!</h1>
-            <h2>Join MEDIBuddy 🏥</h2>
-            <p>Your one-stop healthcare assistant for all your medical needs.<br><br>
-                From booking appointments 📅 to locating nearby hospitals 🗺️, we've got you covered.
-                Access your health records 📄, request ambulances 🚑, and get medicines delivered 💊.
-                Experience smart 🤖, accessible 🌐, and reliable healthcare — all in one place.</p>
-        </div>
-        <div class="login-section">
-            <h3>Sign in</h3>
-            <p>Be part of the MEDIBuddy Community 🏥 </p>
+<body class="bg-gray-50 flex items-center justify-center min-h-screen">
+<canvas id="canvas"></canvas>
+<div class="container mx-auto px-4 py-8 flex flex-col items-center justify-center min-h-screen relative z-10">
+<div class="w-full max-w-md glassmorphism rounded-2xl p-8 floating">
+<div class="flex items-center justify-center mb-6">
+<h1 class="font-['Pacifico'] text-3xl gradient-text">MEDIBuddy</h1>
+</div>
+<h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Welcome Back</h2>
+<form class="space-y-6">
+<div class="relative">
+<label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<div class="w-5 h-5 flex items-center justify-center text-gray-400">
+<i class="ri-mail-line"></i>
+</div>
+</div>
+<input type="email" id="email" class="custom-input pl-10 w-full h-12 px-4 rounded-lg text-gray-800 bg-white" placeholder="Enter your email">
+</div>
+</div>
+<div class="relative">
+<label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<div class="w-5 h-5 flex items-center justify-center text-gray-400">
+<i class="ri-lock-line"></i>
+</div>
+</div>
+<input type="password" id="password" class="custom-input pl-10 w-full h-12 px-4 rounded-lg text-gray-800 bg-white" placeholder="Enter your password">
+<div class="toggle-password w-5 h-5 flex items-center justify-center">
+<i class="ri-eye-line"></i>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center">
+<input type="checkbox" id="remember" class="custom-checkbox sr-only">
+<label for="remember" class="checkbox-label flex items-center text-sm text-gray-600 cursor-pointer">
+Remember me
+</label>
+</div>
+<a href="home.html" class="text-sm text-primary hover:text-opacity-80 font-medium">Forgot Password?</a>
+</div>
+<div>
+    
+<button href="home.html" class="login-btn w-full h-12 text-white font-medium rounded-button !rounded-button whitespace-nowrap" >
+    <a href="home.html">
+    
+Login
+</a>
+</button>
 
-            <form action="/login" id="loginForm" method="POST">
-                <div class="form-group">
-                    <label for="username">User Name</label>
-                    <input type="text" id="username" name="username" required>
-                </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required>
-                </div>
-                <div class="form-group remember-forgot">
-                    <label>
-                        <input type="checkbox" name="remember"> Remember me
-                    </label>
-                    <a href="#">Forget Password?</a>
-                </div>  
-                <button type="submit" class="btn">Sign in</button>
-            </form>
+</div>
 
-            <p class="signup-link">Don't have an account? <a href="#">Sign Up</a></p>
-        </div>
-    </div>
-    <script src="{{url_for('static', filename='js/script.js') }}"></script>
+
+
+<div class="relative flex items-center justify-center">
+<div class="flex-grow h-px bg-gray-200"></div>
+<span class="px-4 text-sm text-gray-500 bg-transparent">Or continue with</span>
+<div class="flex-grow h-px bg-gray-200"></div>
+</div>
+<div class="grid grid-cols-3 gap-4">
+<button type="button" id="google-auth-btn" class="social-btn flex items-center justify-center h-12 bg-white border border-gray-200 rounded-button !rounded-button whitespace-nowrap relative overflow-hidden">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-google-fill text-red-500"></i>
+</div>
+<div id="google-auth-loader" class="absolute inset-0 bg-white flex items-center justify-center opacity-0 transition-opacity duration-300">
+<div class="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+</div>
+</button>
+<button type="button" class="social-btn flex items-center justify-center h-12 bg-white border border-gray-200 rounded-button !rounded-button whitespace-nowrap">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-facebook-fill text-blue-600"></i>
+</div>
+</button>
+<button type="button" class="social-btn flex items-center justify-center h-12 bg-white border border-gray-200 rounded-button !rounded-button whitespace-nowrap">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-apple-fill"></i>
+</div>
+</button>
+</div>
+<p class="text-center text-sm text-gray-600">
+Don't have an account? <a href="#" class="text-primary font-medium">Sign up</a>
+</p>
+</form>
+</div>
+</div>
+<!-- Chatbot Button -->
+<div id="chatbot-toggle" class="fixed bottom-6 right-6 w-14 h-14 rounded-full gradient-bg flex items-center justify-center cursor-pointer shadow-lg pulse z-50">
+<div class="w-6 h-6 flex items-center justify-center text-white">
+<i class="ri-message-3-line"></i>
+</div>
+</div>
+<!-- Chatbot Container -->
+<div id="chat-container" class="chat-container fixed bottom-24 right-6 w-80 h-96 bg-white rounded-xl shadow-2xl overflow-hidden z-50 flex flex-col">
+<div class="gradient-bg p-4 flex items-center">
+<div class="w-10 h-10 rounded-full bg-white flex items-center justify-center mr-3">
+<div class="w-6 h-6 flex items-center justify-center text-primary">
+<i class="ri-robot-line"></i>
+</div>
+</div>
+<div>
+<h3 class="text-white font-medium">AI Assistant</h3>
+<p class="text-white text-opacity-80 text-xs">Online</p>
+</div>
+<button id="close-chat" class="ml-auto">
+<div class="w-6 h-6 flex items-center justify-center text-white">
+<i class="ri-close-line"></i>
+</div>
+</button>
+</div>
+<div class="flex-1 p-4 overflow-y-auto flex flex-col" id="chat-messages">
+<div class="message message-received">
+Hi there! 👋 I'm your AI assistant. How can I help you with your login today?
+</div>
+</div>
+<div class="p-4 border-t border-gray-100">
+<div class="flex space-x-2">
+<button class="px-3 py-1 text-xs bg-gray-100 rounded-full text-gray-700 hover:bg-gray-200 whitespace-nowrap !rounded-button">Forgot password</button>
+<button class="px-3 py-1 text-xs bg-gray-100 rounded-full text-gray-700 hover:bg-gray-200 whitespace-nowrap !rounded-button">Create account</button>
+<button class="px-3 py-1 text-xs bg-gray-100 rounded-full text-gray-700 hover:bg-gray-200 whitespace-nowrap !rounded-button">Help</button>
+</div>
+<div class="mt-3 flex">
+<input type="text" placeholder="Type a message..." class="flex-1 border-none bg-gray-100 rounded-l-full py-2 px-4 text-sm">
+<button class="bg-primary text-white rounded-r-full px-4 whitespace-nowrap !rounded-button">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-send-plane-fill"></i>
+</div>
+</button>
+</div>
+</div>
+</div>
+<script>
+// 3D Animation
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+let width, height;
+// Particles
+const particles = [];
+const particleCount = 50;
+// Resize handler
+function resize() {
+width = window.innerWidth;
+height = window.innerHeight;
+canvas.width = width;
+canvas.height = height;
+}
+// Particle class
+class Particle {
+constructor() {
+this.reset();
+}
+reset() {
+this.x = Math.random() * width;
+this.y = Math.random() * height;
+this.size = Math.random() * 5 + 1;
+this.speedX = Math.random() * 2 - 1;
+this.speedY = Math.random() * 2 - 1;
+this.color = `rgba(${Math.floor(Math.random() * 50 + 80)}, ${Math.floor(Math.random() * 50 + 100)}, ${Math.floor(Math.random() * 50 + 200)}, ${Math.random() * 0.5 + 0.1})`;
+}
+update() {
+this.x += this.speedX;
+this.y += this.speedY;
+if (this.x > width || this.x < 0) {
+this.speedX = -this.speedX;
+}
+if (this.y > height || this.y < 0) {
+this.speedY = -this.speedY;
+}
+}
+draw() {
+ctx.fillStyle = this.color;
+ctx.beginPath();
+ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+ctx.fill();
+}
+}
+// Initialize particles
+function init() {
+resize();
+for (let i = 0; i < particleCount; i++) {
+particles.push(new Particle());
+}
+animate();
+}
+// Animation loop
+function animate() {
+ctx.clearRect(0, 0, width, height);
+// Create gradient background
+const gradient = ctx.createLinearGradient(0, 0, width, height);
+gradient.addColorStop(0, 'rgba(240, 240, 255, 1)');
+gradient.addColorStop(1, 'rgba(250, 250, 255, 1)');
+ctx.fillStyle = gradient;
+ctx.fillRect(0, 0, width, height);
+// Update and draw particles
+for (let i = 0; i < particles.length; i++) {
+particles[i].update();
+particles[i].draw();
+}
+// Connect particles with lines
+connectParticles();
+requestAnimationFrame(animate);
+}
+// Connect nearby particles with lines
+function connectParticles() {
+const maxDistance = 150;
+for (let i = 0; i < particles.length; i++) {
+for (let j = i; j < particles.length; j++) {
+const dx = particles[i].x - particles[j].x;
+const dy = particles[i].y - particles[j].y;
+const distance = Math.sqrt(dx * dx + dy * dy);
+if (distance < maxDistance) {
+const opacity = 1 - (distance / maxDistance);
+ctx.strokeStyle = `rgba(150, 150, 255, ${opacity * 0.2})`;
+ctx.lineWidth = 1;
+ctx.beginPath();
+ctx.moveTo(particles[i].x, particles[i].y);
+ctx.lineTo(particles[j].x, particles[j].y);
+ctx.stroke();
+}
+}
+}
+}
+// Handle mouse movement
+let mouseX = 0;
+let mouseY = 0;
+window.addEventListener('mousemove', (e) => {
+mouseX = e.x;
+mouseY = e.y;
+// Affect nearby particles
+for (let i = 0; i < particles.length; i++) {
+const dx = particles[i].x - mouseX;
+const dy = particles[i].y - mouseY;
+const distance = Math.sqrt(dx * dx + dy * dy);
+if (distance < 100) {
+const angle = Math.atan2(dy, dx);
+const force = (100 - distance) / 500;
+particles[i].x += Math.cos(angle) * force;
+particles[i].y += Math.sin(angle) * force;
+}
+}
+});
+// Initialize 3D animation
+init();
+// Chatbot functionality
+const chatbotToggle = document.getElementById('chatbot-toggle');
+const chatContainer = document.getElementById('chat-container');
+const closeChat = document.getElementById('close-chat');
+chatbotToggle.addEventListener('click', () => {
+chatContainer.classList.add('active');
+});
+closeChat.addEventListener('click', () => {
+chatContainer.classList.remove('active');
+});
+// Password toggle functionality
+const togglePassword = document.querySelector('.toggle-password');
+const passwordInput = document.getElementById('password');
+togglePassword.addEventListener('click', function() {
+const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+passwordInput.setAttribute('type', type);
+// Toggle icon
+const icon = this.querySelector('i');
+if (type === 'password') {
+icon.classList.remove('ri-eye-off-line');
+icon.classList.add('ri-eye-line');
+} else {
+icon.classList.remove('ri-eye-line');
+icon.classList.add('ri-eye-off-line');
+}
+});
+// Custom checkbox functionality
+const checkbox = document.getElementById('remember');
+const checkboxLabel = document.querySelector('.checkbox-label');
+checkbox.addEventListener('change', function() {
+if (this.checked) {
+checkboxLabel.classList.add('text-primary');
+} else {
+checkboxLabel.classList.remove('text-primary');
+}
+});
+// Handle window resize
+window.addEventListener('resize', resize);
+
+// Google OAuth functionality
+const googleAuthBtn = document.getElementById('google-auth-btn');
+const googleAuthLoader = document.getElementById('google-auth-loader');
+
+googleAuthBtn.addEventListener('click', function() {
+    // Show loading spinner
+    googleAuthLoader.classList.remove('opacity-0');
+    googleAuthLoader.classList.add('opacity-100');
+    
+    // Simulate OAuth redirect (in a real implementation, this would redirect to Google)
+    setTimeout(() => {
+        // In a real implementation, this would be:
+        // window.location.href = 'https://accounts.google.com/o/oauth2/v2/auth?client_id=YOUR_CLIENT_ID&redirect_uri=YOUR_REDIRECT_URI&response_type=code&scope=email%20profile&access_type=offline';
+        
+        // For demo purposes, we'll simulate the OAuth flow
+        simulateOAuthFlow();
+    }, 500);
+});
+
+function simulateOAuthFlow() {
+    // Simulate a delay for the OAuth process
+    setTimeout(() => {
+        // Hide loading spinner
+        googleAuthLoader.classList.remove('opacity-100');
+        googleAuthLoader.classList.add('opacity-0');
+        
+        // Create a success message
+        const chatMessages = document.getElementById('chat-messages');
+        const successMessage = document.createElement('div');
+        successMessage.className = 'message message-received';
+        successMessage.textContent = 'Successfully authenticated with Google! Welcome back.';
+        
+        // Add the message to the chat
+        chatMessages.appendChild(successMessage);
+        
+        // Open the chat to show the success message
+        chatContainer.classList.add('active');
+        
+        // Add a user-like message to simulate a complete interaction
+        setTimeout(() => {
+            const userMessage = document.createElement('div');
+            userMessage.className = 'message message-sent';
+            userMessage.textContent = 'Thanks for the quick login!';
+            chatMessages.appendChild(userMessage);
+            
+            // Scroll to the bottom of the chat
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }, 1000);
+    }, 2000);
+}
+
+// Function to handle the OAuth callback (in a real implementation)
+function handleOAuthCallback() {
+    // This function would be called when the user is redirected back from Google
+    // It would extract the authorization code from the URL and exchange it for tokens
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    
+    if (code) {
+        // In a real implementation, you would exchange this code for tokens
+        // via a server-side API call
+        console.log('Authorization code received:', code);
+        
+        // Show success message or redirect to dashboard
+    }
+}
+
+// Check if this page load is a callback from OAuth
+if (window.location.search.includes('code=')) {
+    handleOAuthCallback();
+}
+document.getElementById('loginForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    // Simple validation
+    if (username === "user@345" && password === "password") {
+        alert('Login successful!');
+        window.location.href = 'home.html'; // Redirect to home page
+    } else {
+        alert('Invalid username or password');
+    }
+});
+</script>
 </body>
 </html>
