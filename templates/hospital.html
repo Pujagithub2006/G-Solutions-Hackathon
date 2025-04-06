@@ -304,8 +304,9 @@
     function getTypeFromName(name) {
       const lower = name.toLowerCase();
       if (lower.includes("govt") || lower.includes("government")) return "Government";
-      if (lower.includes("private")) return "Private";
       if (lower.includes("multi")) return "Multispeciality";
+      else return "Private";
+      
       return "General";
     }
 
