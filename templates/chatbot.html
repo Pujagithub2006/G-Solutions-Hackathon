@@ -95,8 +95,46 @@
         </div>
     </div>
 
+
     <script>
+        let latitude = null; // Initialize latitude variable
+        let longitude = null; // Initialize longitude variable
+
+            if(navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition( // Get user's current location
+                    function(position) {
+                            latitude = position.coords.latitude;
+                            longitude = position.coords.longitude;
+                        
+                            console.log("User Location: ", latitude, longitude);
+                    },
+                    
+                    function(error) {
+                        console.error("Location error: ", error);
+                        
+                        latitude = 18.5204;
+                        longitude = 73.8567;
+                        
+                    }
+                );
+            }
+                          
+            
+            else {
+                alert("Geolocation is not supported by this browser.");
+                latitude = 18.5204;
+                longitude = 73.8567;
+            }       
+
+
+
+        // Default location (Pune, India)
         function sendMessage() {
+            if(latitude == null || longitude == null) {
+                alert("Location loading, please wait...");
+                return;
+            }
+
             let inputField = document.getElementById("user-input");
             let message = inputField.value.trim();
             if (!message) return;
@@ -104,17 +142,37 @@
             let chatBox = document.getElementById("chat-box");
             let userMessage = `<div class='user-message'>${message}</div>`;
             chatBox.innerHTML += userMessage;
-            chatBox.scrollTop = chatBox.scrollHeight;
+            chatBox.scrollTo({
+                top: chatBox.scrollHeight,
+                behavior: 'smooth',
+            });
+
             inputField.value = "";
+
+            console.log("Sending:", {
+                message: userMessage,
+                username: localStorage.getItem("username")
+            });
+
             
             fetch('/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: message, username: "Puja" })
+                body: JSON.stringify({ 
+                    message: message, // Send the user message to the server
+                    username: "Puja", // Send the username to the server
+                    location: {
+                        lat: latitude,
+                        lon: longitude
+                    } // Send user location to the server
+                }),
+
+                
+
             })
             .then(response => response.json())
             .then(data => {
-                let botMessage = `<div class='bot-message'>${data.response}</div>`;
+                let botMessage = `<div class='bot-message'>${data.response.replace(/\n/g, "<br>")}</div>`;
                 chatBox.innerHTML += botMessage;
                 chatBox.scrollTop = chatBox.scrollHeight;
             })
@@ -123,3 +181,5 @@
     </script>
 </body>
 </html>
+
+
