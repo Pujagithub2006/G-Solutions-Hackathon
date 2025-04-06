@@ -25,56 +25,56 @@
   <main>
     <div class="grid-container">
 
-      <!-- AI Assistant Healthcare -->
-      <div class="grid-item">
-        <img src="{{url_for('static', filename='images/img1.webp') }}" alt="test image">
-        <div class="text-content">
-          <h3>AI Assistant Healthcare</h3>
-          <p>Connect with an AI-powered healthcare assistant for instant medical advice and support.</p>
-        </div>
-      </div>
-
-      <!-- Appointment Booking -->
-      <div class="grid-item">
-        <img src="{{url_for('static', filename='images/img1.webp') }}" alt="test image">
-        <div class="text-content">
-          <h3>Appointment Booking</h3>
-          <p>Book appointments with doctors, specialists, or clinics in just a few clicks.</p>
-        </div>
-      </div>
-
-      <!-- Nearest Hospital -->
-      <div class="grid-item">
-        <img src="{{url_for('static', filename='images/img1.webp') }}" alt="test image">
-        <div class="text-content">
-          <h3>Nearest Hospital</h3>
-          <p>Find the nearest hospitals or clinics with filters for multispeciality hospitals or clinics.</p>
-          <button onclick="showFilters()">Filter Options</button>
-          <div id="filters" style="display: none;">
-            <label><input type="checkbox" name="filter" value="clinics"> Clinics</label>
-            <label><input type="checkbox" name="filter" value="multispeciality"> Multispeciality Hospitals</label>
+        <!-- AI Assistant Healthcare -->
+      <a href="{{ url_for('chat_ui') }}" target="_blank"> <!--only the endpoint-->
+        <div class="grid-item">
+          <img src="{{url_for('static', filename='images/img1.webp') }}" alt="test image">
+          <div class="text-content">
+            <h3>AI Assistant Healthcare</h3>
+            <p>Connect with an AI-powered healthcare assistant for instant medical advice and support.</p>
           </div>
         </div>
-      </div>
+      </a>
 
-      <!-- Urgent Ambulance Request -->
-      <div class="grid-item">
-        <img src="{{url_for('static', filename='images/img1.webp') }}" alt="test image">
-        <div class="text-content">
-          <h3>Urgent Ambulance Request</h3>
-          <p>Request an ambulance instantly during emergencies with real-time tracking.</p>
-          <button onclick="requestAmbulance()">Request Now</button>
+         <!-- Nearest Hospital -->
+      <a href="{{ url_for('hospital') }}" target="_blank">
+        <div class="grid-item">
+          <img src="{{url_for('static', filename='images/img1.webp') }}" alt="test image">
+          <div class="text-content">
+            <h3>Nearest Hospital</h3>
+            <p>Find the nearest hospitals or clinics with filters for multispeciality hospitals or clinics.</p>
+            <button onclick="showFilters()">Filter Options</button>
+            <div id="filters" style="display: none;">
+              <label><input type="checkbox" name="filter" value="clinics"> Clinics</label>
+              <label><input type="checkbox" name="filter" value="multispeciality"> Multispeciality Hospitals</label>
+            </div>
+          </div>
         </div>
-      </div>
+      </a>
+
+
+        <!-- Urgent Ambulance Request -->
+      <a href="{{ url_for('send_help') }}" target="_blank">
+        <div class="grid-item">
+          <img src="{{url_for('static', filename='images/img1.webp') }}" alt="test image">
+          <div class="text-content">
+            <h3>Urgent Ambulance Request</h3>
+            <p>Request an ambulance instantly during emergencies with real-time tracking.</p>
+            <button onclick="requestAmbulance()">Request Now</button>
+          </div>
+        </div>
+      </a>
 
       <!-- Health Records -->
-      <div class="grid-item">
-        <img src="{{url_for('static', filename='images/img1.webp') }}" alt="test image">
-        <div class="text-content">
-          <h3>Health Records</h3>
-          <p>Access and manage your health records securely anytime, anywhere.</p>
+      <a href="https://docs.google.com/spreadsheets/d/1p5jt9bfXvpk4KcobN0om43Ig2eE-X7lRnP2WSFmqcJQ/edit?gid=0#gid=0" target="_blank">
+        <div class="grid-item">
+          <img src="{{url_for('static', filename='images/img1.webp') }}" alt="test image">
+          <div class="text-content">
+            <h3>Health Records</h3>
+            <p>Access and manage your health records securely anytime, anywhere.</p>
+          </div>
         </div>
-      </div>
+      </a>
 
       <!-- Pharmacy Delivery -->
       <div class="grid-item">
@@ -84,6 +84,18 @@
           <p>Get medicines delivered to your doorstep from trusted pharmacies.</p>
         </div>
       </div>
+
+        <!-- Appointment Booking -->
+      
+      <div class="grid-item">
+        <img src="{{url_for('static', filename='images/img1.webp') }}" alt="test image">
+        <div class="text-content">
+          <h3>Appointment Booking</h3>
+          <p>Book appointments with doctors, specialists, or clinics in just a few clicks.</p>
+        </div>
+      </div>
+
+      
 
     </div>
   </main>

@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template, session
+from flask import Flask, request, jsonify, render_template, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
@@ -10,19 +10,60 @@ from dotenv import load_dotenv
 import unicodedata  
 from flask_cors import CORS
 from datetime import timedelta
+from sheet_logger import log_to_sheet # Importing the log_to_sheet function from sheet_logger.py
 
+# for twilio
+from twilio.rest import Client
 
-load_dotenv("keys.env") # loading the environment variables from .env file
+load_dotenv(".env") # loading the environment variables from .env file
+
+account_sid = os.getenv('ACCOUNT_SID')
+auth_token = os.getenv('AUTH_TOKEN')
+twilio_number = os.getenv('TWILIO_NUMBER')
+emergency_number = os.getenv('EMERGENCY_NUMBER')
+# HERE API credentials
+HERE_API_KEY = os.getenv("SERP_API_KEY")
 
 DEFAULT_CITY = "Pune"
-
-
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY") # loading the gemini api key from the .env file
-SERP_API_KEY = os.getenv("SERP_API_KEY") # loading the serp api key from the .env file
+
 
 genai.configure(api_key=GOOGLE_API_KEY) # setting the gemini api key to the api_key attribute
 
+# for twilio
+def get_location():
+    """ Get current location coordinates (latitude & longitude) """
+    # Using a public IP location service (for testing) - replace with real GPS data in production
+    response = requests.get("https://ipinfo.io/json")
+    data = response.json()
+    
+    if "loc" in data:
+        lat, lon = data["loc"].split(",")
+        return lat, lon
+    return None, None
 
+def reverse_geocode(lat, lon):
+    """ Convert latitude & longitude to an address using HERE API """
+    url = f"https://revgeocode.search.hereapi.com/v1/revgeocode?at={lat},{lon}&apiKey={HERE_API_KEY}"
+    response = requests.get(url)
+    data = response.json()
+    
+    if "items" in data and len(data["items"]) > 0:
+        return data["items"][0]["address"]["label"]  # Returns full address
+    return "Unknown Location"
+
+def send_sms(message):
+    """ Send an SMS using Twilio """
+    client = Client(account_sid, auth_token)
+    
+    sms = client.messages.create(
+        body=message,
+        from_=twilio_number,
+        to=emergency_number
+    )
+    return sms.sid
+
+# for chatbot
 def get_ai_response(prompt): 
     model = genai.GenerativeModel("models/gemini-1.5-flash-latest")
     response = model.generate_content(prompt)
@@ -179,23 +220,46 @@ with app.app_context():
 
 
 
-
-
-
-
-
-
 # Routes
-@app.route('/') # route to home page
+ # for twilio
+@app.route("/send_help", methods=["GET"])
+def send_help():
+    lat, lon = get_location()
+    
+    if not lat or not lon:
+        return jsonify({"error": "Unable to get location"}), 500
+
+    address = reverse_geocode(lat, lon)
+    location_link = f"https://www.google.com/maps?q={lat},{lon}"
+    
+    # Emergency message with location
+    message = f" HELP! There is an emergency! \n📍 Location: {address}\n🔗 {location_link}"
+    
+    sms_id = send_sms(message)
+    
+    return jsonify({"message": "Emergency SMS Sent!", "sms_id": sms_id, "location": address})
+
+ # for chatbot
+@app.route('/') # route to intro page
 def index():
     return render_template('index.html')
+
+@app.route("/home")
+def home():
+    return render_template("home.html") # render the home page (automatically looks for home.html in templates folder)
+
+@app.route("/hospital")
+def hospital():
+    return render_template("hospital.html") # render the hospital page (automatically looks for hospital.html in templates folder)
 
 @app.route('/login', methods=['GET', 'POST']) # route to login after submitting the login form and render the login form
 def login():
     if request.method == 'POST':
-        data = request.json
-        username = data.get("username")
-        password = data.get("password")
+        
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        return redirect(url_for('http://127.0.0.1:5000/home')) # redirect to home page after login
 
         # Query the database for the user
         user = User.query.filter_by(username=username).first()
@@ -203,7 +267,8 @@ def login():
         if user and check_password_hash(user.password, password):
             return jsonify({"success": True, "message": f"Welcome {username}! "})
         else:
-            return jsonify({"success": False})
+            return jsonify({"success": False})        
+        
     
     return render_template('login.html') # if GET request then, render the login page
 
@@ -220,8 +285,8 @@ def chat():
     user_message = data.get("message")
     username = data.get("username", "Anonymous")
     location = data.get("location", {})
-    latitude = location.get("lat", 18.5204)
-    longitude = location.get("lon", 73.8567)
+    latitude = location.get("lat", 18.45724228948669)
+    longitude = location.get("lon", 73.88036779027553)
 
     city = DEFAULT_CITY
 
@@ -245,10 +310,12 @@ def chat():
                 conn.close()
                 response_text = f"✅ Appointment booked with {hospital['name']} at {hospital['location']}."
                 session["history"].append({"user": user_message, "bot": response_text})
+                log_to_sheet(user_message, response_text) 
                 return jsonify({"response": response_text})
 
         response_text = "❌ Hospital not found. Please check the name and try again."
         session["history"].append({"user": user_message, "bot": response_text})
+        log_to_sheet(user_message, response_text) 
         return jsonify({"response": response_text})
 
     # Hospital search logic — Problem 2 fix
@@ -276,15 +343,19 @@ def chat():
                 f"Here are 10 hospitals near you:\n\n{hospital_list}\n\n"
                  " To book an appointment, type: `Book appointment with <hospital name>`"
             )
+            response_text += '<br><br>🔗 <a href="http://127.0.0.1:5500/templates/hospital.html" target="_blank">Find these hospitals here</a>'
         else:
             response_text = "Sorry, I couldn't find any hospitals near you at the moment."
 
         session["history"].append({"user": user_message, "bot": response_text})
+        log_to_sheet(user_message, response_text) 
         return jsonify({"response": response_text})
 
     # Default chatbot logic
     response_text = get_ai_response(user_message)
     session["history"].append({"user": user_message, "bot": response_text})
+
+    log_to_sheet(user_message, response_text)  # Log the conversation to Google Sheets
     return jsonify({"response": response_text})
 
 

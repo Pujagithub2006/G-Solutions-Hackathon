@@ -6,3 +6,4 @@ env.bak/
 venv.bak/
 keys.env
 __pycache__/
+creds.json

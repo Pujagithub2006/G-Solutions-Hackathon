@@ -4,8 +4,7 @@ from twilio.rest import Client
 from dotenv import load_dotenv
 import os
 
-from app import SERP_API_KEY
-load_dotenv()
+load_dotenv(".env")  # Load environment variables from .env file
 import requests
 
 app = Flask(__name__)
@@ -18,7 +17,7 @@ twilio_number = os.getenv('TWILIO_NUMBER')
 emergency_number = os.getenv('EMERGENCY_NUMBER')
 
 # HERE API credentials
-HERE_API_KEY = os.getenv(SERP_API_KEY)
+HERE_API_KEY = os.getenv("SERP_API_KEY")
 
 def get_location():
     """ Get current location coordinates (latitude & longitude) """

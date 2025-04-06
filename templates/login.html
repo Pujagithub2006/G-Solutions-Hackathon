@@ -3,21 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@9.4.0/fonts/remixicon.css" rel="stylesheet">
-    <link rel="stylesheet" href="">
+    <link href="https://cdn.jsdelivr.net/npm/remixi con@9.4.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
     <title>Login | MEDIBuddy</title>
 </head>
 <body>
     <div class="container">
         <div class="welcome-section">
-            <h1>WELCOME</h1>
-            <h2>YOUR HEADLINE NAME</h2>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim quis nostrud exercitation.</p>
+            <h1>👋 WELCOME!</h1>
+            <h2>Join MEDIBuddy 🏥</h2>
+            <p>Your one-stop healthcare assistant for all your medical needs.<br><br>
+                From booking appointments 📅 to locating nearby hospitals 🗺️, we've got you covered.
+                Access your health records 📄, request ambulances 🚑, and get medicines delivered 💊.
+                Experience smart 🤖, accessible 🌐, and reliable healthcare — all in one place.</p>
         </div>
         <div class="login-section">
             <h3>Sign in</h3>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-            <form id="loginForm" method="post">
+            <p>Be part of the MEDIBuddy Community 🏥 </p>
+
+            <form action="/login" id="loginForm" method="POST">
                 <div class="form-group">
                     <label for="username">User Name</label>
                     <input type="text" id="username" name="username" required>
@@ -31,9 +35,10 @@
                         <input type="checkbox" name="remember"> Remember me
                     </label>
                     <a href="#">Forget Password?</a>
-                </div>
+                </div>  
                 <button type="submit" class="btn">Sign in</button>
             </form>
+
             <p class="signup-link">Don't have an account? <a href="#">Sign Up</a></p>
         </div>
     </div>
